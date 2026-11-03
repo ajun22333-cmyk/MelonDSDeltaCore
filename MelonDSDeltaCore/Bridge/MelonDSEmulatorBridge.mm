@@ -52,6 +52,8 @@ extern int64_t wfcFlags; // Required to ensure we don't generate invalid WFC ID 
 }
 
 // Copied from melonDS source (no longer exists in HEAD)
+static std::unique_ptr<BgmReplacer> gBgmReplacer;
+
 void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever this should be named?
 {
     u32 cur_word = 0;
@@ -212,6 +214,8 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
     
     if ([self isInitialized])
     {
+        NDS::SetSoundFifoHook(nullptr, nullptr);
+        gBgmReplacer.reset();
         NDS::DeInit();
     }
     else
@@ -330,6 +334,9 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
     
     self.stopping = NO;
     
+    gBgmReplacer = std::make_unique<BgmReplacer>(32768);
+    NDS::SetSoundFifoHook(nullptr, nullptr);
+    
     NDS::Start();
 }
 
@@ -338,6 +345,8 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
     self.stopping = YES;
     
     NDS::Stop();
+    NDS::SetSoundFifoHook(nullptr, nullptr);
+    gBgmReplacer.reset();
     
     [self.audioEngine stop];
     
@@ -418,6 +427,17 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
     }
     
     NDS::RunFrame();
+    
+    if (gBgmReplacer)
+    {
+        gBgmReplacer->afterMainFrame();
+        static int16_t bgmBuffer[0x1000];
+        int bgmFrames = gBgmReplacer->readBGM(bgmBuffer, 0x1000);
+        if (bgmFrames > 0)
+        {
+            [self.audioRenderer.bgmAudioBuffer writeBuffer:bgmBuffer size:bgmFrames * 4];
+        }
+    }
     
     static int16_t buffer[0x1000];
     u32 availableBytes = SPU::GetOutputSize();
