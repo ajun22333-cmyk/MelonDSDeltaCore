@@ -333,7 +333,7 @@ void BgmReplacer::indexCart()
                     }
                 }
             }
-            seqIndex.emplace(CRC32(sdat + foff, (int)fsize), std::move(si));
+            seqIndex.emplace(CRC32(const_cast<u8*>(sdat + foff), (int)fsize), std::move(si));
         }
     }
 
@@ -361,7 +361,7 @@ int BgmReplacer::classify(u32 seqBase, std::string& name)
 
     bool music, loop = false;
     float seconds = 0;
-    auto it = seqIndex.find(CRC32(f, (int)size));
+    auto it = seqIndex.find(CRC32(const_cast<u8*>(f), (int)size));
     if (it != seqIndex.end())
     {
         name = it->second.name.empty() ? "(이름 없음)" : it->second.name;
