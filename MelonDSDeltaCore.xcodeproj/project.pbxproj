@@ -115,6 +115,7 @@
 		D5B7242B2E26DAEE00D3E5F3 /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = D5B7242A2E26DAEE00D3E5F3 /* libresolv.tbd */; };
 		D5C7DD1B2E26D35A0048FF5C /* MelonDSTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = BF02B2FD24367CF5001B4E65 /* MelonDSTypes.m */; };
 		A11111111111111111111111 /* NitroSynth.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A22222222222222222222222 /* NitroSynth.cpp */; };
+		A55555555555555555555551 /* BgmReplacer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A55555555555555555555552 /* BgmReplacer.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -375,6 +376,8 @@
 		D5B7242A2E26DAEE00D3E5F3 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.0.sdk/usr/lib/libresolv.tbd; sourceTree = DEVELOPER_DIR; };
 		A22222222222222222222222 /* NitroSynth.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MelonDSDeltaCore/Audio/NitroSynth.cpp; sourceTree = SOURCE_ROOT; };
 		A44444444444444444444444 /* NitroSynth.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MelonDSDeltaCore/Audio/NitroSynth.h; sourceTree = SOURCE_ROOT; };
+		A55555555555555555555552 /* BgmReplacer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MelonDSDeltaCore/Audio/BgmReplacer.cpp; sourceTree = SOURCE_ROOT; };
+		A55555555555555555555553 /* BgmReplacer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MelonDSDeltaCore/Audio/BgmReplacer.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -562,6 +565,8 @@
 			children = (
 				A22222222222222222222222 /* NitroSynth.cpp */,
 				A44444444444444444444444 /* NitroSynth.h */,
+				A55555555555555555555552 /* BgmReplacer.cpp */,
+				A55555555555555555555553 /* BgmReplacer.h */,
 				BF7317872356624000774F10 /* MelonDSDeltaCore */,
 				BF02B28424366DDF001B4E65 /* libMelonDS */,
 				D5B44BF02E29A71400EA8B6C /* Dependencies */,
@@ -941,6 +946,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A11111111111111111111111 /* NitroSynth.cpp in Sources */,
+				A55555555555555555555551 /* BgmReplacer.cpp in Sources */,
 				D5B723B82E26D8D900D3E5F3 /* sha1.c in Sources */,
 				BF062AA925436F440010FF6D /* DSi_AES.cpp in Sources */,
 				BF062AB5254370050010FF6D /* aes.c in Sources */,

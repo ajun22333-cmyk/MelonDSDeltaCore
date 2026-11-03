@@ -25,6 +25,7 @@
 #include "melonDS/src/SPU.h"
 #include "melonDS/src/GPU.h"
 #include "melonDS/src/AREngine.h"
+#include "MelonDSDeltaCore/Audio/BgmReplacer.h"
 
 #include "melonDS/src/frontend/qt_sdl/Config.h"
 #include "melonDS/src/frontend/qt_sdl/LAN_Socket.h"
