@@ -115,7 +115,6 @@
 		D5B7242B2E26DAEE00D3E5F3 /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = D5B7242A2E26DAEE00D3E5F3 /* libresolv.tbd */; };
 		D5C7DD1B2E26D35A0048FF5C /* MelonDSTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = BF02B2FD24367CF5001B4E65 /* MelonDSTypes.m */; };
 		A11111111111111111111111 /* NitroSynth.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A22222222222222222222222 /* NitroSynth.cpp */; };
-		A33333333333333333333333 /* NitroSynth.h in Sources */ = {isa = PBXBuildFile; fileRef = A44444444444444444444444 /* NitroSynth.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */

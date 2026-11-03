@@ -9,7 +9,14 @@
 #include <array>
 #include <vector>
 
-#include "types.h"
+#include "../../melonDS/src/types.h"
+
+// The Delta melonDS 0.9.5 fork keeps primitive types in the global namespace.
+// NitroSynth was authored against the newer melonDS namespace API.
+namespace melonDS {
+using ::u8; using ::u16; using ::u32; using ::u64;
+using ::s8; using ::s16; using ::s32; using ::s64;
+}
 
 class NitroSynth
 {
