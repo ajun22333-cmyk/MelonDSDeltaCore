@@ -783,6 +783,11 @@ void BgmReplacer::onSoundFifo(u32 word)
     }
 }
 
+void BgmReplacer::installSoundHook()
+{
+    NDS::SetSoundFifoHook(&BgmReplacer::fifoHook, this);
+}
+
 void BgmReplacer::afterMainFrame()
 {
         

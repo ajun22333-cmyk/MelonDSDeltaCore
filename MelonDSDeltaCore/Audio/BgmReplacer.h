@@ -46,6 +46,7 @@ public:
     void setSfxVolume(int volume) { sfxVolume = volume; }
 
     // 에뮬레이션 스레드: 원본 코어가 프레임 하나를 돌린 뒤
+    void installSoundHook();
     void afterMainFrame();
     // 에뮬레이션 스레드: 상태를 불러온 직후 (프레임 번호가 그대로여도 추적을 다시 하게 한다)
     void onStateLoaded() { forceReset = true; }

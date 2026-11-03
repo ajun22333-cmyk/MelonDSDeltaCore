@@ -338,7 +338,7 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
     NDS::SetSoundFifoHook(nullptr, nullptr);
     
     NDS::Start();
-    NDS::SetSoundFifoHook(&BgmReplacer::fifoHook, gBgmReplacer.get());
+    gBgmReplacer->installSoundHook();
 }
 
 - (void)stop
