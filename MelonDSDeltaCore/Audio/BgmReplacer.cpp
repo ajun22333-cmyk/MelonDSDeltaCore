@@ -835,15 +835,31 @@ void BgmReplacer::afterMainFrame()
     // 출력 버퍼가 모자란 만큼만 만든다. 오디오 장치가 소리를 가져가는 속도(실제 시간)에 맞춰지므로
     // 원본의 배속과 무관하게 1배속이 된다
     synth.setMemory(NDS::MainRAM, NDS::MainRAMMask);
-    const int rate = audioFrequency;
-    const size_t target = (size_t)rate * 60 / 1000;  // 약 60ms 분량
+    const int rate = std::max(audioFrequency, 1);
+    // 게임 프레임 수가 아니라 실제 경과 시간에 맞춰 샘플을 생성한다.
+    // 그래야 빠른 감기 중에도 BGM 출력 큐에 게임 프레임마다 1프레임 분량을 밀어 넣지 않는다.
+    const auto now = std::chrono::steady_clock::now();
+    double elapsed = 1.0 / 60.0;
+    if (hasRenderTime)
+    {
+        elapsed = std::chrono::duration<double>(now - lastRenderTime).count();
+        elapsed = std::clamp(elapsed, 0.0, 0.100);
+    }
+    lastRenderTime = now;
+    hasRenderTime = true;
+
+    double exactFrames = elapsed * rate + renderFrameRemainder;
+    size_t need = (size_t)exactFrames;
+    renderFrameRemainder = exactFrames - need;
+    if (need == 0) return;
+
     size_t have;
     {
         std::lock_guard lock(ringMutex);
         have = ringCount;
     }
-    if (have >= target) return;
-    const size_t need = std::min(target - have, kRingFrames - have);
+    need = std::min(need, kRingFrames - have);
+    if (need == 0) return;
     renderBuf.resize(need * 2);
     // 효과음으로 연주 중인 자체 재생기 플레이어에만 효과음 볼륨을 건다
     const float sfxGain = std::clamp(sfxVolume.load(), 0, 256) / 256.0f;

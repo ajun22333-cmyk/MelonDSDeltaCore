@@ -9,6 +9,7 @@
 #define BGMREPLACER_H
 
 #include <array>
+#include <chrono>
 #include <atomic>
 #include <mutex>
 #include <string>
@@ -108,6 +109,9 @@ private:
     void recoverFromDriver();
 
     int audioFrequency;
+    std::chrono::steady_clock::time_point lastRenderTime{};
+    bool hasRenderTime = false;
+    double renderFrameRemainder = 0.0;
     std::atomic<bool> enabled{true};
     std::atomic<bool> wanted{true};
     std::atomic<bool> ffCutscenes{false};
