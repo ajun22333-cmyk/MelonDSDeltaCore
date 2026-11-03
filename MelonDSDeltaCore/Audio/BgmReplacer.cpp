@@ -4,9 +4,9 @@
 #include <algorithm>
 #include <cstring>
 
-#include "CRC32.h"
-#include "NDS.h"
-#include "NDSCart.h"
+#include "../../melonDS/src/CRC32.h"
+#include "../../melonDS/src/NDS.h"
+#include "../../melonDS/src/NDSCart.h"
 
 using namespace melonDS;
 
