@@ -427,7 +427,9 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
         // NDS::SetSkipFrame(!processVideo);
     }
     
+    GPU::SetSkip2DRender(!processVideo);
     NDS::RunFrame();
+    GPU::SetSkip2DRender(false);
     
     if (gBgmReplacer)
     {
