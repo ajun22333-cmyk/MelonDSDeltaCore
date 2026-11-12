@@ -441,10 +441,9 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
     }
     
     static int16_t buffer[0x1000];
-    u32 availableBytes = SPU::GetOutputSize();
-    availableBytes = MAX(availableBytes, (u32)(sizeof(buffer) / (2 * sizeof(int16_t))));
-       
-    int samples = SPU::ReadOutput(buffer, availableBytes);
+    const int maxSamples = (int)(sizeof(buffer) / (2 * sizeof(buffer[0])));
+    const int availableSamples = MIN(SPU::GetOutputSize(), maxSamples);
+    int samples = SPU::ReadOutput(buffer, availableSamples);
     [self.audioRenderer.audioBuffer writeBuffer:buffer size:samples * 4];
     
     if (processVideo)
