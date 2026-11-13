@@ -540,7 +540,7 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
                        << (profileARM9Ms / profileSamples) << ","
                        << (profileARM7Ms / profileSamples) << ","
                        << (profileGPU3DMs / profileSamples) << ","
-                       << (profileAudioMs / profileSamples) << ",
+                       << (profileAudioMs / profileSamples) << ","
                        << profileVideoSamples << ","
                        << (profileVideoSamples ? profileVideoMs / profileVideoSamples : 0.0)
                        << "\n";
