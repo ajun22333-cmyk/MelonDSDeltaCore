@@ -727,14 +727,35 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
 - (void)saveSaveStateToURL:(NSURL *)URL
 {
     Savestate *savestate = new Savestate(URL.fileSystemRepresentation, true);
-    NDS::DoSavestate(savestate);
+    if (!savestate->Error)
+    {
+        bool success = NDS::DoSavestate(savestate);
+        if (!success || savestate->Error)
+        {
+            NSLog(@"DS savestate write failed: %@", URL.lastPathComponent);
+            [[NSFileManager defaultManager] removeItemAtURL:URL error:nil];
+        }
+    }
+    else
+    {
+        NSLog(@"DS savestate file could not be created: %@", URL.lastPathComponent);
+    }
     delete savestate;
 }
 
 - (void)loadSaveStateFromURL:(NSURL *)URL
 {
     Savestate *savestate = new Savestate(URL.fileSystemRepresentation, false);
-    NDS::DoSavestate(savestate);
+    if (!savestate->Error)
+    {
+        bool success = NDS::DoSavestate(savestate);
+        if (!success || savestate->Error)
+            NSLog(@"DS savestate restore failed or was incomplete: %@", URL.lastPathComponent);
+    }
+    else
+    {
+        NSLog(@"DS savestate file is invalid or unreadable: %@", URL.lastPathComponent);
+    }
     delete savestate;
 }
 
