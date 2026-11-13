@@ -116,6 +116,7 @@
 		D5C7DD1B2E26D35A0048FF5C /* MelonDSTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = BF02B2FD24367CF5001B4E65 /* MelonDSTypes.m */; };
 		A11111111111111111111111 /* NitroSynth.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A22222222222222222222222 /* NitroSynth.cpp */; };
 		A55555555555555555555551 /* BgmReplacer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A55555555555555555555552 /* BgmReplacer.cpp */; };
+		BF925D0F255E07E00088EFF2 /* ARMJIT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF925D09255E07E00088EFF2 /* ARMJIT.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1032,6 +1033,7 @@
 				BF02B2D124366EF6001B4E65 /* CRC32.cpp in Sources */,
 				BF02B2C924366EF6001B4E65 /* GPU3D_Soft.cpp in Sources */,
 				BF74CC662553756B00060964 /* ARMJIT_Compiler.cpp in Sources */,
+				BF925D0F255E07E00088EFF2 /* ARMJIT.cpp in Sources */,
 				BF74CC622553756B00060964 /* ARMJIT_LoadStore.cpp in Sources */,
 				BF74CC642553756B00060964 /* ARMJIT_ALU.cpp in Sources */,
 				D5B723B12E26D51E00D3E5F3 /* DSi_NAND.cpp in Sources */,
@@ -1081,6 +1083,7 @@
 				DEVELOPMENT_TEAM = 6XVY5G3U44;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					"JIT_ENABLED=1",
 					"DEBUG=1",
 					"$(inherited)",
 				);
@@ -1101,6 +1104,7 @@
 		BF02B28A24366DDF001B4E65 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = ("JIT_ENABLED=1", "$(inherited)");
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 6XVY5G3U44;
@@ -1265,6 +1269,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					"JIT_ENABLED=1",
 					"DEBUG=1",
 					"$(inherited)",
 				);
@@ -1293,6 +1298,7 @@
 		BF73178F2356624000774F10 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = ("JIT_ENABLED=1", "$(inherited)");
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
