@@ -31,6 +31,9 @@
 #include "melonDS/src/frontend/qt_sdl/LAN_Socket.h"
 
 #include <memory>
+#include <chrono>
+#include <fstream>
+#include <iomanip>
 
 #import <notify.h>
 #import <pthread.h>
@@ -369,6 +372,28 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
 
 - (void)runFrameAndProcessVideo:(BOOL)processVideo
 {
+    // Diagnostic-only sampling: one frame out of every 120. Results are
+    // appended to Documents so they can be retrieved through the iOS Files app.
+    using ProfileClock = std::chrono::steady_clock;
+    static uint64_t profileFrameIndex = 0;
+    static uint64_t profileSamples = 0;
+    static uint64_t profileVideoSamples = 0;
+    static double profileCoreMs = 0.0;
+    static double profileAudioMs = 0.0;
+    static double profileVideoMs = 0.0;
+    static ProfileClock::time_point profileWindowStart = ProfileClock::now();
+    static std::string profilePath = [] {
+        NSString *path = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/Delta-DS-Profile.csv"];
+        std::ofstream output(path.fileSystemRepresentation, std::ios::out | std::ios::trunc);
+        if (output.is_open())
+            output << "window_seconds,sampled_frames,avg_core_ms,avg_audio_ms,video_samples,avg_video_ms\\n";
+        return std::string(path.fileSystemRepresentation);
+    }();
+    bool profileSample = ((++profileFrameIndex % 120) == 0);
+    ProfileClock::time_point profilePhaseStart;
+    if (profileSample)
+        profilePhaseStart = ProfileClock::now();
+
     if ([self isStopping])
     {
         return;
@@ -432,6 +457,12 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
     
     GPU::SetSkip2DRender(!processVideo);
     NDS::RunFrame();
+    if (profileSample)
+    {
+        auto phaseEnd = ProfileClock::now();
+        profileCoreMs += std::chrono::duration<double, std::milli>(phaseEnd - profilePhaseStart).count();
+        profilePhaseStart = phaseEnd;
+    }
     GPU::SetSkip2DRender(false);
     
     if (gBgmReplacer)
@@ -453,7 +484,13 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
     {
         [self.audioRenderer.audioBuffer writeBuffer:buffer size:samples * 4];
     }
-    
+    if (profileSample)
+    {
+        auto phaseEnd = ProfileClock::now();
+        profileAudioMs += std::chrono::duration<double, std::milli>(phaseEnd - profilePhaseStart).count();
+        profilePhaseStart = phaseEnd;
+    }
+
     if (processVideo)
     {
         int screenBufferSize = 256 * 192 * 4;
@@ -462,6 +499,41 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
         memcpy(self.videoRenderer.videoBuffer + screenBufferSize, GPU::Framebuffer[GPU::FrontBuffer][1], screenBufferSize);
         
         [self.videoRenderer processFrame];
+        if (profileSample)
+        {
+            auto phaseEnd = ProfileClock::now();
+            profileVideoMs += std::chrono::duration<double, std::milli>(phaseEnd - profilePhaseStart).count();
+            profilePhaseStart = phaseEnd;
+            profileVideoSamples++;
+        }
+    }
+
+    if (profileSample)
+    {
+        profileSamples++;
+        auto now = ProfileClock::now();
+        auto windowSeconds = std::chrono::duration<double>(now - profileWindowStart).count();
+        if (windowSeconds >= 10.0 && profileSamples > 0)
+        {
+            std::ofstream output(profilePath, std::ios::out | std::ios::app);
+            if (output.is_open())
+            {
+                output << std::fixed << std::setprecision(4)
+                       << windowSeconds << ","
+                       << profileSamples << ","
+                       << (profileCoreMs / profileSamples) << ","
+                       << (profileAudioMs / profileSamples) << ","
+                       << profileVideoSamples << ","
+                       << (profileVideoSamples ? profileVideoMs / profileVideoSamples : 0.0)
+                       << "\\n";
+            }
+            profileSamples = 0;
+            profileVideoSamples = 0;
+            profileCoreMs = 0.0;
+            profileAudioMs = 0.0;
+            profileVideoMs = 0.0;
+            profileWindowStart = now;
+        }
     }
     
     if (WifiAP::ClientStatus != previousClientStatus)
