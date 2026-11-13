@@ -33,6 +33,17 @@
 #include <memory>
 #include <chrono>
 #include <fstream>
+
+// Serialize DS core access between the frame loop and host-triggered save states.
+static NSRecursiveLock *MelonDSEmulatorStateLock(void)
+{
+    static NSRecursiveLock *lock;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        lock = [[NSRecursiveLock alloc] init];
+    });
+    return lock;
+}
 #include <iomanip>
 
 #import <notify.h>
@@ -404,7 +415,10 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
     {
         return;
     }
-    
+
+    NSRecursiveLock *stateLock = MelonDSEmulatorStateLock();
+    [stateLock lock];
+
     int previousClientStatus = WifiAP::ClientStatus;
     
     uint32_t inputs = self.activatedInputs;
@@ -584,6 +598,8 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
             [[NSNotificationCenter defaultCenter] postNotificationName:MelonDSDidConnectToWFCNotification object:self];
         }
     }
+
+    [stateLock unlock];
 }
 
 - (nullable NSData *)readMemoryAtAddress:(NSInteger)address size:(NSInteger)size
@@ -726,6 +742,9 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
 
 - (void)saveSaveStateToURL:(NSURL *)URL
 {
+    NSRecursiveLock *stateLock = MelonDSEmulatorStateLock();
+    [stateLock lock];
+
     Savestate *savestate = new Savestate(URL.fileSystemRepresentation, true);
     if (!savestate->Error)
     {
@@ -741,10 +760,14 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
         NSLog(@"DS savestate file could not be created: %@", URL.lastPathComponent);
     }
     delete savestate;
+    [stateLock unlock];
 }
 
 - (void)loadSaveStateFromURL:(NSURL *)URL
 {
+    NSRecursiveLock *stateLock = MelonDSEmulatorStateLock();
+    [stateLock lock];
+
     Savestate *savestate = new Savestate(URL.fileSystemRepresentation, false);
     if (!savestate->Error)
     {
@@ -757,6 +780,7 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
         NSLog(@"DS savestate file is invalid or unreadable: %@", URL.lastPathComponent);
     }
     delete savestate;
+    [stateLock unlock];
 }
 
 #pragma mark - Cheats -
