@@ -386,7 +386,7 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
         NSString *path = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/Delta-DS-Profile.csv"];
         std::ofstream output(path.fileSystemRepresentation, std::ios::out | std::ios::trunc);
         if (output.is_open())
-            output << "window_seconds,sampled_frames,avg_core_ms,avg_audio_ms,video_samples,avg_video_ms\\n";
+            output << "window_seconds,sampled_frames,avg_core_ms,avg_audio_ms,video_samples,avg_video_ms\n";
         return std::string(path.fileSystemRepresentation);
     }();
     bool profileSample = ((++profileFrameIndex % 120) == 0);
@@ -455,6 +455,8 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
         // NDS::SetSkipFrame(!processVideo);
     }
     
+    if (profileSample)
+        profilePhaseStart = ProfileClock::now();
     GPU::SetSkip2DRender(!processVideo);
     NDS::RunFrame();
     if (profileSample)
@@ -525,7 +527,7 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
                        << (profileAudioMs / profileSamples) << ","
                        << profileVideoSamples << ","
                        << (profileVideoSamples ? profileVideoMs / profileVideoSamples : 0.0)
-                       << "\\n";
+                       << "\n";
             }
             profileSamples = 0;
             profileVideoSamples = 0;
