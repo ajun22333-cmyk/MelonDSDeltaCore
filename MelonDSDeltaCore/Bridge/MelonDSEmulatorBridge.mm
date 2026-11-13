@@ -379,6 +379,9 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
     static uint64_t profileSamples = 0;
     static uint64_t profileVideoSamples = 0;
     static double profileCoreMs = 0.0;
+    static double profileARM9Ms = 0.0;
+    static double profileARM7Ms = 0.0;
+    static double profileGPU3DMs = 0.0;
     static double profileAudioMs = 0.0;
     static double profileVideoMs = 0.0;
     static ProfileClock::time_point profileWindowStart = ProfileClock::now();
@@ -386,7 +389,7 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
         NSString *path = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/Delta-DS-Profile.csv"];
         std::ofstream output(path.fileSystemRepresentation, std::ios::out | std::ios::trunc);
         if (output.is_open())
-            output << "window_seconds,sampled_frames,avg_core_ms,avg_audio_ms,video_samples,avg_video_ms\n";
+            output << "window_seconds,sampled_frames,avg_core_ms,avg_arm9_ms,avg_arm7_ms,avg_gpu3d_ms,avg_audio_ms,video_samples,avg_video_ms\n";
         return std::string(path.fileSystemRepresentation);
     }();
     bool profileSample = ((++profileFrameIndex % 120) == 0);
@@ -458,7 +461,17 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
     if (profileSample)
         profilePhaseStart = ProfileClock::now();
     GPU::SetSkip2DRender(!processVideo);
+    NDS::SetProfileBreakdownEnabled(profileSample);
     NDS::RunFrame();
+    if (profileSample)
+    {
+        double arm9Ms = 0.0, arm7Ms = 0.0, gpu3dMs = 0.0;
+        NDS::GetProfileBreakdown(&arm9Ms, &arm7Ms, &gpu3dMs);
+        profileARM9Ms += arm9Ms;
+        profileARM7Ms += arm7Ms;
+        profileGPU3DMs += gpu3dMs;
+        NDS::SetProfileBreakdownEnabled(false);
+    }
     if (profileSample)
     {
         auto phaseEnd = ProfileClock::now();
@@ -524,7 +537,10 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
                        << windowSeconds << ","
                        << profileSamples << ","
                        << (profileCoreMs / profileSamples) << ","
-                       << (profileAudioMs / profileSamples) << ","
+                       << (profileARM9Ms / profileSamples) << ","
+                       << (profileARM7Ms / profileSamples) << ","
+                       << (profileGPU3DMs / profileSamples) << ","
+                       << (profileAudioMs / profileSamples) << ",
                        << profileVideoSamples << ","
                        << (profileVideoSamples ? profileVideoMs / profileVideoSamples : 0.0)
                        << "\n";
@@ -532,6 +548,9 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
             profileSamples = 0;
             profileVideoSamples = 0;
             profileCoreMs = 0.0;
+            profileARM9Ms = 0.0;
+            profileARM7Ms = 0.0;
+            profileGPU3DMs = 0.0;
             profileAudioMs = 0.0;
             profileVideoMs = 0.0;
             profileWindowStart = now;
