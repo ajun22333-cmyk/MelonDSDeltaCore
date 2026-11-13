@@ -247,9 +247,13 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
     
     NDS::SetConsoleType((int)self.systemType);
     
-    // AltJIT does not yet support melonDS 0.9.5.
-    // Config::JIT_Enable = [self isJITEnabled];
-    // Config::JIT_FastMemory = NO;
+    // Experimental native ARM64 JIT. This is separate from AltJIT.
+#ifdef JIT_ENABLED
+    Config::JIT_Enable = true;
+    // Keep the JIT's fast-memory mirror disabled on iOS until its address-space
+    // mappings have been validated on device.
+    Config::JIT_FastMemory = false;
+#endif
     
     if ([[NSFileManager defaultManager] fileExistsAtPath:self.bios7URL.path] &&
         [[NSFileManager defaultManager] fileExistsAtPath:self.bios9URL.path] &&
