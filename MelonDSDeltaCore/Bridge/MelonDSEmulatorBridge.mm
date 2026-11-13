@@ -409,13 +409,16 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
         }
     }
     
-    static int16_t micBuffer[735];
-    NSInteger readBytes = (NSInteger)[self.microphoneBuffer readIntoBuffer:micBuffer preferredSize:735 * sizeof(int16_t)];
-    NSInteger readFrames = readBytes / sizeof(int16_t);
-    
-    if (readFrames > 0)
+    if (self.isMicrophoneEnabled)
     {
-        NDS::MicInputFrame(micBuffer, (int)readFrames);
+        static int16_t micBuffer[735];
+        NSInteger readBytes = (NSInteger)[self.microphoneBuffer readIntoBuffer:micBuffer preferredSize:735 * sizeof(int16_t)];
+        NSInteger readFrames = readBytes / sizeof(int16_t);
+
+        if (readFrames > 0)
+        {
+            NDS::MicInputFrame(micBuffer, (int)readFrames);
+        }
     }
     
     if ([self isJITEnabled])
@@ -446,7 +449,10 @@ void ParseTextCode(char* text, int tlen, u32* code, int clen) // or whatever thi
     const int maxSamples = (int)(sizeof(buffer) / (2 * sizeof(buffer[0])));
     const int availableSamples = MIN(SPU::GetOutputSize(), maxSamples);
     int samples = SPU::ReadOutput(buffer, availableSamples);
-    [self.audioRenderer.audioBuffer writeBuffer:buffer size:samples * 4];
+    if (samples > 0)
+    {
+        [self.audioRenderer.audioBuffer writeBuffer:buffer size:samples * 4];
+    }
     
     if (processVideo)
     {
